@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package garantexGRPC;
+
+option go_package = "garantex.sso.v1.ssov1";
+
+service Rates {
+  rpc Get(GetRequest) returns (GetResponse);
+}
+
+enum Market {
+  usdtrub = 0;
+  usdtusd = 1;
+  usdteur = 2;
+}
+
+message GetRequest {
+  Market market = 1;
+}
+
+
+message GetResponse {
+  int64 timestamp = 1;
+  Market market = 2;
+  double ask = 3;
+  double bid = 4;
+}

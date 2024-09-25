@@ -1,0 +1,42 @@
+services:
+  app:
+    container_name: ${APP_NAME}
+    build: .
+    restart: always
+    env_file: .env
+    ports:
+      - ${GRPC_HOST}:${GRPC_PORT}:${GRPC_PORT}
+    depends_on:
+      - db
+
+
+  db:
+    container_name: db
+    image: postgres:latest
+    environment:
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - ${DB_PORT}:${DB_PORT}
+
+
+  prometheus:
+    container_name: ${APP_NAME}_metrics
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    depends_on:
+      - app
+
+  jaeger:
+    container_name: ${APP_NAME}_trace
+    image: jaegertracing/all-in-one:latest
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
+    ports:
+      - "16686:16686"
+      - "4317:4317"
+      - "4318:4318"
